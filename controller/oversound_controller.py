@@ -342,3 +342,39 @@ async def update_label(request: Request, labelId: int):
         return JSONResponse(content={"error": "Error al actualizar la discográfica"}, status_code=500)
 
 
+@app.delete("/label/{labelId}")
+async def delete_label(request: Request, labelId: int):
+    """
+    Ruta para eliminar una discográfica
+    """
+    token = request.cookies.get("oversound_auth")
+    userdata = obtain_user_data(token)
+    
+    if not userdata:
+        return JSONResponse(content={"error": "No autenticado"}, status_code=401)
+    
+    try:
+        # Verificar que sea propietario
+        label_resp = requests.get(f"{servers.TYA}/label/{labelId}", timeout=2, headers={"Accept": "application/json"})
+        label_resp.raise_for_status()
+        label_data = label_resp.json()
+        
+        if label_data.get('ownerId') != userdata.get('userId'):
+            return JSONResponse(content={"error": "No tienes permisos"}, status_code=403)
+        
+        # Eliminar la discográfica
+        delete_resp = requests.delete(
+            f"{servers.TYA}/label/{labelId}",
+            timeout=2,
+            headers={"Accept": "application/json"}
+        )
+        
+        if delete_resp.ok:
+            return JSONResponse(content={"message": "Discográfica eliminada"})
+        else:
+            error_data = delete_resp.json() if delete_resp.text else {}
+            return JSONResponse(content=error_data, status_code=delete_resp.status_code)
+    
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={"error": "Error al eliminar la discográfica"}, status_code=500)
