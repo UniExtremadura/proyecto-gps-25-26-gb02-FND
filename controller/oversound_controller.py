@@ -378,3 +378,189 @@ async def delete_label(request: Request, labelId: int):
     except Exception as e:
         print(e)
         return JSONResponse(content={"error": "Error al eliminar la discográfica"}, status_code=500)
+
+# ============ ENDPOINTS DE BÚSQUEDA ============
+
+@app.get("/api/search/song")
+def search_songs(q: str = Query(..., min_length=3)):
+    """
+    Busca canciones por query y devuelve los datos completos
+    """
+    try:
+        # Buscar (devuelve lista de objetos con songId)
+        search_resp = requests.get(
+            f"{servers.TYA}/song/search",
+            params={"q": q},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if not search_resp.ok:
+            return JSONResponse(content=[], status_code=200)
+        
+        song_objects = search_resp.json()
+        
+        if not song_objects or len(song_objects) == 0:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Extraer IDs de los objetos
+        song_ids = [obj.get('songId') for obj in song_objects if obj.get('songId')]
+        
+        if not song_ids:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Resolver datos completos con IDs separados por comas en el parámetro
+        ids_string = ','.join(map(str, song_ids))
+        list_resp = requests.get(
+            f"{servers.TYA}/song/list",
+            params={"ids": ids_string},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if list_resp.ok:
+            return JSONResponse(content=list_resp.json(), status_code=200)
+        else:
+            return JSONResponse(content=[], status_code=200)
+            
+    except requests.RequestException as e:
+        print(f"Error buscando canciones: {e}")
+        return JSONResponse(content=[], status_code=200)
+
+@app.get("/api/search/album")
+def search_albums(q: str = Query(..., min_length=3)):
+    """
+    Busca álbumes por query y devuelve los datos completos
+    """
+    try:
+        # Buscar (devuelve lista de objetos con albumId)
+        search_resp = requests.get(
+            f"{servers.TYA}/album/search",
+            params={"q": q},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if not search_resp.ok:
+            return JSONResponse(content=[], status_code=200)
+        
+        album_objects = search_resp.json()
+        
+        if not album_objects or len(album_objects) == 0:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Extraer IDs de los objetos
+        album_ids = [obj.get('albumId') for obj in album_objects if obj.get('albumId')]
+        
+        if not album_ids:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Resolver datos completos con IDs separados por comas en el parámetro
+        ids_string = ','.join(map(str, album_ids))
+        list_resp = requests.get(
+            f"{servers.TYA}/album/list",
+            params={"ids": ids_string},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if list_resp.ok:
+            return JSONResponse(content=list_resp.json(), status_code=200)
+        else:
+            return JSONResponse(content=[], status_code=200)
+            
+    except requests.RequestException as e:
+        print(f"Error buscando álbumes: {e}")
+        return JSONResponse(content=[], status_code=200)
+
+@app.get("/api/search/artist")
+def search_artists(q: str = Query(..., min_length=3)):
+    """
+    Busca artistas por query y devuelve los datos completos
+    """
+    try:
+        # Buscar (devuelve lista de objetos con artistId)
+        search_resp = requests.get(
+            f"{servers.TYA}/artist/search",
+            params={"q": q},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if not search_resp.ok:
+            return JSONResponse(content=[], status_code=200)
+        
+        artist_objects = search_resp.json()
+        
+        if not artist_objects or len(artist_objects) == 0:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Extraer IDs de los objetos
+        artist_ids = [obj.get('artistId') for obj in artist_objects if obj.get('artistId')]
+        
+        if not artist_ids:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Resolver datos completos con IDs separados por comas en el parámetro
+        ids_string = ','.join(map(str, artist_ids))
+        list_resp = requests.get(
+            f"{servers.TYA}/artist/list",
+            params={"ids": ids_string},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if list_resp.ok:
+            return JSONResponse(content=list_resp.json(), status_code=200)
+        else:
+            return JSONResponse(content=[], status_code=200)
+            
+    except requests.RequestException as e:
+        print(f"Error buscando artistas: {e}")
+        return JSONResponse(content=[], status_code=200)
+
+@app.get("/api/search/merch")
+def search_merch(q: str = Query(..., min_length=3)):
+    """
+    Busca merchandising por query y devuelve los datos completos
+    """
+    try:
+        # Buscar (devuelve lista de objetos con merchId)
+        search_resp = requests.get(
+            f"{servers.TYA}/merch/search",
+            params={"q": q},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if not search_resp.ok:
+            return JSONResponse(content=[], status_code=200)
+        
+        merch_objects = search_resp.json()
+        
+        if not merch_objects or len(merch_objects) == 0:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Extraer IDs de los objetos
+        merch_ids = [obj.get('merchId') for obj in merch_objects if obj.get('merchId')]
+        
+        if not merch_ids:
+            return JSONResponse(content=[], status_code=200)
+        
+        # Resolver datos completos con IDs separados por comas en el parámetro
+        ids_string = ','.join(map(str, merch_ids))
+        list_resp = requests.get(
+            f"{servers.TYA}/merch/list",
+            params={"ids": ids_string},
+            timeout=5,
+            headers={"Accept": "application/json"}
+        )
+        
+        if list_resp.ok:
+            return JSONResponse(content=list_resp.json(), status_code=200)
+        else:
+            return JSONResponse(content=[], status_code=200)
+            
+    except requests.RequestException as e:
+        print(f"Error buscando merchandising: {e}")
+        return JSONResponse(content=[], status_code=200)
